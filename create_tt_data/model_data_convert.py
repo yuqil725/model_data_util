@@ -6,7 +6,7 @@ from tensorflow.keras import Sequential
 from constant import OPTIONS, ONE_HOT_ENC, NUM_DIM
 
 
-def convertModelToRawData(model, columns, x_shape, num_dim=NUM_DIM):
+def convertModelToRawData(model, columns, num_data, num_dim=NUM_DIM):
     """
     Given a model, convert model conf into dataframe
     The columns of dataframe depends on the global variable options
@@ -21,7 +21,7 @@ def convertModelToRawData(model, columns, x_shape, num_dim=NUM_DIM):
         new_row['optimizer'] = model.optimizer.get_config()['name']
         new_row['loss'] = model.loss
         new_row['active'] = 1
-        new_row['num_data'] = x_shape[0]
+        new_row['num_data'] = num_data
         out_shape = None
         if i > 0:
             assert model.layers[i - 1].name == conf['name']

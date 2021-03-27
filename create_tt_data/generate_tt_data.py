@@ -80,7 +80,7 @@ def generateTTData(num_data, out_dim=10, max_layers=32, type="cnn", options=OPTI
         elif type == "ffnn":
             model = buildFFnnModel(kwargs_list, layer_orders)
         test_res = testTT(model)
-        df = convertModelToRawData(model, columns, test_res['x_shape'])
+        df = convertModelToRawData(model, columns, test_res['x_shape'][0])
         result["X_df"].append(df)
         result["y_median"].append(test_res['median'])
         result["y_mean"].append(test_res['mean'])
