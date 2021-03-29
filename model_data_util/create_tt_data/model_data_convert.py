@@ -32,6 +32,7 @@ def convertModelToRawData(model, columns, num_data, batch_input_shape=None, num_
     Given a model, convert model conf into dataframe
     The columns of dataframe depends on the global variable options
     """
+    columns = [x for x in columns if "out_dim" not in x] + [f"out_dim_{x}" for x in range(num_dim)]
     df = pd.DataFrame(columns=columns)
     try:
         model.summary(print_fn=lambda x: "")
