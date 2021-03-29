@@ -3,16 +3,44 @@ import pandas as pd
 from tensorflow import keras
 from tensorflow.keras import Sequential
 
-from constant import OPTIONS, ONE_HOT_ENC, NUM_DIM
+from model_data_util.constant import OPTIONS, ONE_HOT_ENC, NUM_DIM, DEFAULT_INPUT_SHAPE
 
 
-def convertModelToRawData(model, columns, num_data, num_dim=NUM_DIM):
+def createInputbyModel(model, data_points, data_shape=DEFAULT_INPUT_SHAPE):
+    """
+    Generate data according to model's conf
+    The input shape is set in default
+    """
+    last_dense_conf = {}
+    first_layer_conf = {}
+    for l_conf in model.get_config()['layers']:
+        if 'Dense' == l_conf['class_name']:
+            last_dense_conf = l_conf['config']
+        if first_layer_conf == {} and 'InputLayer' != l_conf['class_name']:
+            first_layer_conf = l_conf
+    assert last_dense_conf != {}
+    out_shape = last_dense_conf['units']
+    if first_layer_conf['class_name'] == 'Dense':
+        data_shape = [out_shape] if type(out_shape) == int else out_shape
+    x = np.ones((data_points, *data_shape))
+    y = np.ones((data_points, out_shape))
+    return (x, y)
+
+
+def convertModelToRawData(model, columns, num_data, batch_input_shape=None, num_dim=NUM_DIM):
     """
     Given a model, convert model conf into dataframe
     The columns of dataframe depends on the global variable options
     """
     df = pd.DataFrame(columns=columns)
-    for i, l in enumerate(model.get_config()['layers']):
+    try:
+        model.summary(print_fn=lambda x: "")
+    except:
+        assert batch_input_shape is not None, "Expect not None 'batch_input_shape'"
+        x, y = createInputbyModel(model, num_data, batch_input_shape[1:])
+        model.fit(x, y, batch_size=batch_input_shape[0], epochs=1, verbose=False)
+    model_layers = model.get_config()['layers'].copy()
+    for i, l in enumerate(model_layers):
         l_name = l['class_name']
         conf = l['config']
         new_row = dict(zip(list(OPTIONS[l_name].keys()), [conf[k] for k in OPTIONS[l_name].keys()]))
@@ -24,17 +52,16 @@ def convertModelToRawData(model, columns, num_data, num_dim=NUM_DIM):
         new_row['num_data'] = num_data
         out_shape = None
         if i > 0:
-            assert model.layers[i - 1].name == conf['name']
+            assert model.layers[i - 1].name == conf['name']  # model.layer doesn't include InputLayer whereas conf does
             out_shape = np.array(model.layers[i - 1].output.shape)
-        elif i == 0 and l_name == "InputLayer":
-            out_shape = np.array(conf['batch_input_shape'])
-        if out_shape is not None:
-            assert out_shape.shape[0] <= num_dim
-            for j in range(num_dim):
-                if j < out_shape.shape[0]:
-                    new_row[f'out_dim_{j}'] = out_shape[j]
-                else:
-                    new_row[f'out_dim_{j}'] = np.nan
+        elif i == 0:
+            out_shape = batch_input_shape
+        assert out_shape.shape[0] <= num_dim
+        for j in range(num_dim):
+            if j < out_shape.shape[0]:
+                new_row[f'out_dim_{j}'] = out_shape[j]
+            else:
+                new_row[f'out_dim_{j}'] = np.nan
         df = df.append(new_row, ignore_index=True)
     return df
 
@@ -45,9 +72,11 @@ def convertRawDataToModel(df):
     :return: model made by df, and the num of data
     """
     assert len(df.optimizer.unique()) == 1
+    assert "inputlayer" in df.layer.str.lower().unique()
     optimizer = df.optimizer.unique()[0]
     loss = df.loss.unique()[0]
     num_data = df.num_data.unique()[0]
+    batch_input_shape = df[[x for x in df.columns if "out_dim" in x]].dropna(axis=1).values[0]
     model = Sequential()
     drop_cols = ["active", "optimizer", "layer", "loss", "num_data", *[x for x in df.columns if "out_dim" in x]]
     for i in range(df.shape[0]):
@@ -59,7 +88,7 @@ def convertRawDataToModel(df):
         kwargs = df.iloc[i].drop(drop_cols).dropna().to_dict()
         model.add(getattr(keras.layers, l_name)(**kwargs))
     model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
-    return model, num_data
+    return model, num_data, batch_input_shape
 
 
 def _preprocessRawData_Onehot_Helper(res, col, df, one_hot_enc):

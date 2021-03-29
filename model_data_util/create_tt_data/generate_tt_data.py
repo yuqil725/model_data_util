@@ -7,11 +7,12 @@ import numpy as np
 from tensorflow import keras
 from tqdm import tqdm
 
-from constant import DEFAULT_INPUT_SHAPE, OPTIONS, COLUMNS
-from create_tt_data.cnn_build_rule import CnnRules
-from create_tt_data.ffnn_build_rule import FFnnRules
-from create_tt_data.model_build import buildCnnModel, generateRandomModelConfigList, buildFFnnModel
-from create_tt_data.model_data_convert import convertModelToRawData
+from model_data_util.constant import OPTIONS, COLUMNS
+from model_data_util.create_tt_data.cnn_build_rule import CnnRules
+from model_data_util.create_tt_data.ffnn_build_rule import FFnnRules
+from model_data_util.create_tt_data.model_build import buildCnnModel, generateRandomModelConfigList, buildFFnnModel
+from model_data_util.create_tt_data.model_data_convert import convertModelToRawData, createInputbyModel, \
+    convertRawDataToModel
 
 
 class TimeHistory(keras.callbacks.Callback):
@@ -23,27 +24,6 @@ class TimeHistory(keras.callbacks.Callback):
 
     def on_epoch_end(self, batch, logs={}):
         self.times.append(time.time() - self.epoch_time_start)
-
-
-def createInputbyModel(model, data_points, data_shape=DEFAULT_INPUT_SHAPE):
-    """
-    Generate data according to model's conf
-    The input shape is set in default
-    """
-    last_dense_conf = {}
-    first_layer_conf = {}
-    for l_conf in model.get_config()['layers']:
-        if 'Dense' == l_conf['class_name']:
-            last_dense_conf = l_conf['config']
-        if first_layer_conf == {} and 'InputLayer' != l_conf['class_name']:
-            first_layer_conf = l_conf
-    assert last_dense_conf != {}
-    out_shape = last_dense_conf['units']
-    if first_layer_conf['class_name'] == 'Dense':
-        data_shape = [out_shape] if type(out_shape) == int else out_shape
-    x = np.ones((data_points, *data_shape))
-    y = np.ones((data_points, out_shape))
-    return (x, y)
 
 
 def testTT(model, epochs=7, batch_size=4):
@@ -61,6 +41,7 @@ def testTT(model, epochs=7, batch_size=4):
     test_res['std'] = np.std(times[2:])
     test_res['x_shape'] = np.array(x).shape
     test_res['y_shape'] = np.array(y).shape
+    test_res["batch_size"] = batch_size
     return test_res
 
 
@@ -80,7 +61,8 @@ def generateTTData(num_data, out_dim=10, max_layers=32, type="cnn", options=OPTI
         elif type == "ffnn":
             model = buildFFnnModel(kwargs_list, layer_orders)
         test_res = testTT(model)
-        df = convertModelToRawData(model, columns, test_res['x_shape'][0])
+        batch_input_shape = np.array([test_res["batch_size"], *test_res['x_shape'][1:]])
+        df = convertModelToRawData(model, columns, test_res['x_shape'][0], batch_input_shape)
         result["X_df"].append(df)
         result["y_median"].append(test_res['median'])
         result["y_mean"].append(test_res['mean'])
@@ -99,7 +81,8 @@ if __name__ == "__main__":
     out_dim = args.out_dim
 
     result = generateTTData(num_data, out_dim, type="ffnn")
-    # print(convertRawDataToModel(result["X_df"][0]))
+    model, num_data, batch_input_shape = convertRawDataToModel(result["X_df"][0])
+    convertModelToRawData(model, result["X_df"][0].columns, 1, batch_input_shape)
     # print(preprocessRawData(result["X_df"][0]).columns)
 
     # pickle.dump(result, open(f"../data/local_dp{DATA_POINTS}_CNN_Data_1.pkl", 'wb'))

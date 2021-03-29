@@ -3,7 +3,7 @@ import random
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, Flatten, MaxPooling2D, Dropout
 
-from constant import DEFAULT_INPUT_SHAPE
+from model_data_util.constant import DEFAULT_INPUT_SHAPE
 
 
 def buildCnnModel(kwargs_list, layer_orders, out_dim):

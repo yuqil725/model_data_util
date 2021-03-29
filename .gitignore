@@ -1,3 +1,7 @@
+#pip
+model_data_util.egg-info
+build/
+
 #virtual environment
 venv
 

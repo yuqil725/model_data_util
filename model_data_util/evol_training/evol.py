@@ -14,10 +14,10 @@ from sklearn.model_selection import train_test_split
 from tensorflow import keras
 from tqdm import tqdm
 
-from constant import OPTIONS
-from create_tt_data.generate_tt_data import testTT
-from create_tt_data.model_build import chooseRandomComb
-from create_tt_data.model_data_convert import preprocessRawData, convertRawDataToModel
+from model_data_util.constant import OPTIONS
+from model_data_util.create_tt_data.generate_tt_data import testTT
+from model_data_util.create_tt_data.model_build import chooseRandomComb
+from model_data_util.create_tt_data.model_data_convert import preprocessRawData, convertRawDataToModel
 
 
 def percentageError(y_pred, y_test):
@@ -192,7 +192,7 @@ def evalChildren(X_df_list, y_list, tt_predictor):
         error = evaluateError(y_pred, y)
         new_X_df = modelModifier(X_df, error)
         new_X_df_list.append(new_X_df)
-        model, _ = convertRawDataToModel(new_X_df)
+        model, tmp1, tmp2 = convertRawDataToModel(new_X_df)
         test_res = testTT(model)
         new_y_list.append(test_res['median'])
     return new_X_df_list, new_y_list

@@ -1,8 +1,8 @@
 import unittest
 
-from create_tt_data.generate_tt_data import testTT
-from create_tt_data.model_build import generateRandomModelConfigList, buildCnnModel
-from create_tt_data.cnn_build_rule import CnnRules
+from model_data_util.create_tt_data.generate_tt_data import testTT
+from model_data_util.create_tt_data.model_build import generateRandomModelConfigList, buildCnnModel
+from model_data_util.create_tt_data.cnn_build_rule import CnnRules
 
 
 class MyTestCase(unittest.TestCase):
