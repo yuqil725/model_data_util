@@ -82,9 +82,10 @@ def convertRawDataToModel(df):
     drop_cols = ["active", "optimizer", "layer", "loss", "num_data", *[x for x in df.columns if "out_dim" in x]]
     for i in range(df.shape[0]):
         l_name = df.iloc[i].layer
-        if l_name not in OPTIONS["Model"]["layer"] and l_name.lower() != "inputlayer":
+        if l_name not in OPTIONS["Model"]["layer"]:
             # only add those layer was in our layer type choices
-            print(f"WARNING: {l_name} layer was skip as not listed in OPTIONS")
+            if l_name.lower() != "inputlayer":
+                print(f"WARNING: {l_name} layer was skip as not listed in OPTIONS")
             continue
         kwargs = df.iloc[i].drop(drop_cols).dropna().to_dict()
         model.add(getattr(keras.layers, l_name)(**kwargs))
