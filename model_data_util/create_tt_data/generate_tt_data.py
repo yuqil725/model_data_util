@@ -1,5 +1,6 @@
 import argparse
 import collections
+import random
 import time
 
 import numpy as np
@@ -29,7 +30,7 @@ def testTT(model, epochs=7, batch_size=4, num_data_range=OPTIONS["Data"]["num_da
     """
     Given a model, test its TT. The first epoch is excluded to avoid setup time
     """
-    num_data = num_data_range
+    num_data = random.choice(num_data_range)
     x, y = createInputbyModel(model, num_data)
     time_callback = TimeHistory()
     model.fit(x, y, epochs=epochs, batch_size=batch_size, callbacks=[time_callback], verbose=False)
