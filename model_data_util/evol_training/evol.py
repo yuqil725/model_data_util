@@ -193,7 +193,7 @@ def evalChildren(X_df_list, y_list, tt_predictor):
         new_X_df = modelModifier(X_df, error)
         new_X_df_list.append(new_X_df)
         model, tmp1, tmp2 = convertRawDataToModel(new_X_df)
-        test_res = testTT(model)
+        test_res = testTT(model, OPTIONS["Data"]["num_data"])
         new_y_list.append(test_res['median'])
     return new_X_df_list, new_y_list
 

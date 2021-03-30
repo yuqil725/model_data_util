@@ -1,8 +1,9 @@
 import unittest
 
+from model_data_util.constant import OPTIONS
+from model_data_util.create_tt_data.cnn_build_rule import CnnRules
 from model_data_util.create_tt_data.generate_tt_data import testTT
 from model_data_util.create_tt_data.model_build import generateRandomModelConfigList, buildCnnModel
-from model_data_util.create_tt_data.cnn_build_rule import CnnRules
 
 
 class MyTestCase(unittest.TestCase):
@@ -21,7 +22,7 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue(len(kwargs_list) == len(layer_orders) + 1 and len(kwargs_list) == len(image_shape_list) + 1,
                         f"Error: incorrect output {len(kwargs_list), len(layer_orders), len(image_shape_list)}")
         model = buildCnnModel(kwargs_list, layer_orders, out_dim)
-        testTT(model)
+        testTT(model, OPTIONS["Data"]["num_data"])
         self.validImageShape(model, image_shape_list)
 
 

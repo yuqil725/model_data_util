@@ -1,6 +1,5 @@
 import argparse
 import collections
-import random
 import time
 
 import numpy as np
@@ -26,11 +25,11 @@ class TimeHistory(keras.callbacks.Callback):
         self.times.append(time.time() - self.epoch_time_start)
 
 
-def testTT(model, epochs=7, batch_size=4):
+def testTT(model, epochs=7, batch_size=4, num_data_range=OPTIONS["Data"]["num_data"]):
     """
     Given a model, test its TT. The first epoch is excluded to avoid setup time
     """
-    num_data = random.choice(OPTIONS["Data"]["num_data"])
+    num_data = num_data_range
     x, y = createInputbyModel(model, num_data)
     time_callback = TimeHistory()
     model.fit(x, y, epochs=epochs, batch_size=batch_size, callbacks=[time_callback], verbose=False)
@@ -60,7 +59,7 @@ def generateTTData(num_data, out_dim=10, max_layers=32, type="cnn", options=OPTI
             model = buildCnnModel(kwargs_list, layer_orders, out_dim)
         elif type == "ffnn":
             model = buildFFnnModel(kwargs_list, layer_orders)
-        test_res = testTT(model)
+        test_res = testTT(model, num_data_range=options["Data"]["num_data"])
         batch_input_shape = np.array([test_res["batch_size"], *test_res['x_shape'][1:]])
         df = convertModelToRawData(model, columns, test_res['x_shape'][0], batch_input_shape)
         result["X_df"].append(df)
