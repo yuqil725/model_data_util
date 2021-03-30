@@ -80,7 +80,7 @@ if __name__ == "__main__":
     num_data = args.num_data
     out_dim = args.out_dim
 
-    result = generateTTData(num_data, out_dim, type="ffnn")
+    result = generateTTData(num_data, out_dim, type="ffnn", max_layers=8)
     model, num_data, batch_input_shape = convertRawDataToModel(result["X_df"][0])
     convertModelToRawData(model, result["X_df"][0].columns, 1, batch_input_shape)
     # print(preprocessRawData(result["X_df"][0]).columns)

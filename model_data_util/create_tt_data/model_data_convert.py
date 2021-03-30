@@ -36,6 +36,7 @@ def convertModelToRawData(model, columns, num_data, batch_input_shape=None, num_
     df = pd.DataFrame(columns=columns)
     try:
         model.summary(print_fn=lambda x: "")
+        batch_input_shape = np.array(model.get_config()["layers"][0]['config']['batch_input_shape'])
     except:
         assert batch_input_shape is not None, "Expect not None 'batch_input_shape'"
         x, y = createInputbyModel(model, num_data, batch_input_shape[1:])
@@ -77,7 +78,7 @@ def convertRawDataToModel(df):
     optimizer = df.optimizer.unique()[0]
     loss = df.loss.unique()[0]
     num_data = df.num_data.unique()[0]
-    batch_input_shape = df[[x for x in df.columns if "out_dim" in x]].dropna(axis=1).values[0]
+    batch_input_shape = df[[x for x in df.columns if "out_dim" in x]].iloc[0].dropna().values
     model = Sequential()
     drop_cols = ["active", "optimizer", "layer", "loss", "num_data", *[x for x in df.columns if "out_dim" in x]]
     for i in range(df.shape[0]):
