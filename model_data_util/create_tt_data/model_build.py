@@ -25,7 +25,8 @@ def buildCnnModel(kwargs_list, layer_orders, out_dim):
         elif l == "Flatten":
             cnn.add(Flatten())
     cnn.add(Dense(out_dim, activation='softmax'))
-    cnn.compile(loss=kwargs_list[-1]["loss"], optimizer=kwargs_list[-1]["optimizer"], metrics=['accuracy'])
+    kwargs = kwargs_list[-1]
+    cnn.compile(metrics=['accuracy'], **kwargs["Compile"])
     return cnn
 
 
@@ -41,7 +42,8 @@ def buildFFnnModel(kwargs_list, layer_orders):
             ffnn.add(Dense(**kwargs))
         elif l == "Dropout":
             ffnn.add(Dropout(**kwargs))
-    ffnn.compile(loss=kwargs_list[-1]["loss"], optimizer=kwargs_list[-1]["optimizer"], metrics=['accuracy'])
+    kwargs = kwargs_list[-1]
+    ffnn.compile(metrics=['accuracy'], **kwargs["Compile"])
     return ffnn
 
 
@@ -159,6 +161,10 @@ def generateRandomModelConfigList(layer_orders, options, max_num_hidden_layer=62
         kwargs_list.append(kwargs)
         new_layer_orders.append(l)
         image_shape_list.append(image_shape.copy())
-    kwargs_list.append({"optimizer": random.sample(options['Model']['optimizer'], 1)[0],
-                        "loss": random.sample(options['Model']['loss'], 1)[0]})
+    kwargs = {}
+    for k in ["Compile", "Fit"]:
+        kwargs[k] = {}
+        for item in options[k].keys():
+            kwargs[k][item] = random.sample(options[k][item], 1)[0]
+    kwargs_list.append(kwargs)
     return kwargs_list, new_layer_orders, image_shape_list

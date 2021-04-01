@@ -10,8 +10,9 @@ OPTIONS["Data"]["num_data"] = np.arange(1, 30, 1) * 32
 
 OPTIONS["Model"]["layer"] = ["Conv2D", "Dense", "MaxPooling2D", "Dropout",
                              "Flatten"]  # the model's layer can be either Conv2D or Dense
-OPTIONS["Model"]["optimizer"] = ["SGD", "RMSprop", "Adam", "Adadelta", "Adagrad", "Adamax", "Nadam", "Ftrl"]
-OPTIONS["Model"]["loss"] = ["categorical_crossentropy", "categorical_hinge", ]
+OPTIONS["Compile"]["optimizer"] = ["SGD", "RMSprop", "Adam", "Adadelta", "Adagrad", "Adamax", "Nadam", "Ftrl"]
+OPTIONS["Compile"]["loss"] = ["categorical_crossentropy", "categorical_hinge", ]
+OPTIONS["Fit"]["batch_size"] = range(1, 32)
 
 OPTIONS["Dense"]["units"] = range(1, 500)
 OPTIONS["Dense"]["activation"] = ["linear", "relu", "sigmoid", "softmax", "softplus", "softsign", "tanh", "selu", "elu",
@@ -42,15 +43,15 @@ for k in OPTIONS.keys():
     if k == "Model":
         continue
     tmp_column_set = tmp_column_set.union(set(OPTIONS[k].keys()))
-COLUMNS = ["active", "layer", "optimizer", "loss", *tmp_column_set, *dim_cols]
+COLUMNS = ["active", "layer", *tmp_column_set, *dim_cols]
 
 # one_hot_enc: the one hot encoder used to convert raw model dataframe into one hot
 ONE_HOT_ENC = dict()
 ONE_HOT_ENC["layer"] = OneHotEncoder(handle_unknown='ignore').fit(
     np.reshape(OPTIONS["Model"]["layer"], (-1, 1)))
 ONE_HOT_ENC["optimizer"] = OneHotEncoder(handle_unknown='ignore').fit(
-    np.reshape(OPTIONS["Model"]["optimizer"], (-1, 1)))
-ONE_HOT_ENC["loss"] = OneHotEncoder(handle_unknown='ignore').fit(np.reshape(OPTIONS["Model"]["loss"], (-1, 1)))
+    np.reshape(OPTIONS["Compile"]["optimizer"], (-1, 1)))
+ONE_HOT_ENC["loss"] = OneHotEncoder(handle_unknown='ignore').fit(np.reshape(OPTIONS["Compile"]["loss"], (-1, 1)))
 ONE_HOT_ENC["activation"] = OneHotEncoder(handle_unknown='ignore').fit(
     np.reshape(list(set(OPTIONS["Dense"]["activation"]).union(set(OPTIONS["Conv2D"]["activation"]))), (-1, 1)))
 
