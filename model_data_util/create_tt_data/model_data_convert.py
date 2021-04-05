@@ -36,8 +36,11 @@ def convertModelToRawData(model, num_data, columns=[], batch_input_shape=None, n
     df = pd.DataFrame(columns=columns)
     try:
         model.summary(print_fn=lambda x: "")
-        batch_input_shape = np.array(model.get_config()["layers"][0]['config']['batch_input_shape'])
-        batch_input_shape[0] = int(np.ceil(num_data / model.history.params['steps']))
+        model_batch_input_shape = np.array(model.get_config()["layers"][0]['config']['batch_input_shape'])
+        if model_batch_input_shape[0] is None:
+            assert batch_input_shape[0] is not None
+            model_batch_input_shape[0] = batch_input_shape[0]
+        batch_input_shape = model_batch_input_shape.copy()
     except:
         assert batch_input_shape is not None, "Expect not None 'batch_input_shape'"
         x, y = createInputbyModel(model, num_data, batch_input_shape[1:])

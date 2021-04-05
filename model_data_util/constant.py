@@ -12,7 +12,7 @@ OPTIONS["Model"]["layer"] = ["Conv2D", "Dense", "MaxPooling2D", "Dropout",
                              "Flatten"]  # the model's layer can be either Conv2D or Dense
 OPTIONS["Compile"]["optimizer"] = ["SGD", "RMSprop", "Adam", "Adadelta", "Adagrad", "Adamax", "Nadam", "Ftrl"]
 OPTIONS["Compile"]["loss"] = ["categorical_crossentropy", "categorical_hinge", ]
-OPTIONS["Fit"]["batch_size"] = range(1, 32)
+OPTIONS["Fit"]["batch_size"] = [2, 4, 8, 16, 32, 64, 128, 256]
 
 OPTIONS["Dense"]["units"] = range(1, 500)
 OPTIONS["Dense"]["activation"] = ["linear", "relu", "sigmoid", "softmax", "softplus", "softsign", "tanh", "selu", "elu",

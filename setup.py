@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = "0.0.1.5.7"
+VERSION = "0.0.1.5.8"
 DESCRIPTION = ""
 LONG_DESCRIPTION = (
     "Used to create random NN, convert NN into data and vise verse"
