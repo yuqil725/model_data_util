@@ -27,24 +27,13 @@ def createInputbyModel(model, data_points, data_shape=DEFAULT_INPUT_SHAPE):
     return (x, y)
 
 
-def convertModelToRawData(model, num_data, columns=[], batch_input_shape=None, num_dim=NUM_DIM):
+def convertModelToRawData(model, num_data, batch_input_shape, columns=[], num_dim=NUM_DIM):
     """
     Given a model, convert model conf into dataframe
     The columns of dataframe depends on the global variable options
     """
     columns = [x for x in columns if "out_dim" not in x] + [f"out_dim_{x}" for x in range(num_dim)]
     df = pd.DataFrame(columns=columns)
-    try:
-        model.summary(print_fn=lambda x: "")
-        model_batch_input_shape = np.array(model.get_config()["layers"][0]['config']['batch_input_shape'])
-        if model_batch_input_shape[0] is None:
-            assert batch_input_shape[0] is not None
-            model_batch_input_shape[0] = batch_input_shape[0]
-        batch_input_shape = model_batch_input_shape.copy()
-    except:
-        assert batch_input_shape is not None, "Expect not None 'batch_input_shape'"
-        x, y = createInputbyModel(model, num_data, batch_input_shape[1:])
-        model.fit(x, y, batch_size=batch_input_shape[0], epochs=1, verbose=False)
     model_layers = model.get_config()['layers'].copy()
     for i, l in enumerate(model_layers):
         l_name = l['class_name']
@@ -56,17 +45,9 @@ def convertModelToRawData(model, num_data, columns=[], batch_input_shape=None, n
         new_row['loss'] = model.loss
         new_row['active'] = 1
         new_row['num_data'] = num_data
-        out_shape = None
-        if i > 0:
-            assert model.layers[i - 1].name == conf['name']  # model.layer doesn't include InputLayer whereas conf does
-            out_shape = np.array(model.layers[i - 1].output.shape)
-            out_shape[0] = batch_input_shape[0]
-        elif i == 0:
-            out_shape = batch_input_shape.copy()
-        assert out_shape.shape[0] <= num_dim
         for j in range(num_dim):
-            if j < out_shape.shape[0]:
-                new_row[f'out_dim_{j}'] = out_shape[j]
+            if j < batch_input_shape.shape[0]:
+                new_row[f'out_dim_{j}'] = batch_input_shape[j]
             else:
                 new_row[f'out_dim_{j}'] = np.nan
         df = df.append(new_row, ignore_index=True)

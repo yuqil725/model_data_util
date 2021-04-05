@@ -165,7 +165,6 @@ def generateRandomModelConfigList(layer_orders, options, max_num_hidden_layer=62
     for k in ["Compile", "Fit"]:
         kwargs[k] = {}
         for item in options[k].keys():
-            print(options[k][item])
             kwargs[k][item] = random.sample(options[k][item], 1)[0]
     kwargs_list.append(kwargs)
     return kwargs_list, new_layer_orders, image_shape_list

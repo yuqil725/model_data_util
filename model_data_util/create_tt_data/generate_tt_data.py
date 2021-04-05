@@ -63,7 +63,7 @@ def generateTTData(num_data, out_dim=10, max_layers=32, type="cnn", options=OPTI
         test_res = testTT(model, num_data_range=options["Data"]["num_data"],
                           batch_size=kwargs_list[-1]["Fit"]["batch_size"])
         batch_input_shape = np.array([test_res["batch_size"], *test_res['x_shape'][1:]])
-        df = convertModelToRawData(model, test_res['x_shape'][0], columns, batch_input_shape)
+        df = convertModelToRawData(model, test_res['x_shape'][0], batch_input_shape, columns)
         result["X_df"].append(df)
         result["y_median"].append(test_res['median'])
         result["y_mean"].append(test_res['mean'])
@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
     result = generateTTData(num_data, out_dim, type="ffnn", max_layers=8)
     model, num_data, batch_input_shape = convertRawDataToModel(result["X_df"][0])
-    convertModelToRawData(model, 1, result["X_df"][0].columns, batch_input_shape)
+    convertModelToRawData(model, 1, batch_input_shape, result["X_df"][0].columns)
     print(result["X_df"][0])
 
     # pickle.dump(result, open(f"../data/local_dp{DATA_POINTS}_CNN_Data_1.pkl", 'wb'))
