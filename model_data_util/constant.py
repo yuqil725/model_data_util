@@ -10,6 +10,8 @@ OPTIONS["Data"]["num_data"] = np.arange(1, 30, 1) * 32
 
 OPTIONS["Model"]["layer"] = ["Conv2D", "Dense", "MaxPooling2D", "Dropout",
                              "Flatten"]  # the model's layer can be either Conv2D or Dense
+OPTIONS["Model"]["pure_activation_rate"] = {1: 0.8, 2: 0.1, 3: 0.05, 4: 0.025, 5: 0.0125,
+                                            6: 0.0125}  # {number of activation types in one NN: probability}
 OPTIONS["Compile"]["optimizer"] = ["SGD", "RMSprop", "Adam", "Adadelta", "Adagrad", "Adamax", "Nadam", "Ftrl"]
 OPTIONS["Compile"]["loss"] = ["categorical_crossentropy", "categorical_hinge", ]
 OPTIONS["Fit"]["batch_size"] = [2, 4, 8, 16, 32, 64, 128, 256]

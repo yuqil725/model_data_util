@@ -10,7 +10,7 @@ from tqdm import tqdm
 from model_data_util.constant import OPTIONS, COLUMNS
 from model_data_util.create_tt_data.cnn_build_rule import CnnRules
 from model_data_util.create_tt_data.ffnn_build_rule import FFnnRules
-from model_data_util.create_tt_data.model_build import buildCnnModel, generateRandomModelConfigList, buildFFnnModel
+from model_data_util.create_tt_data.model_build import ModelBuild
 from model_data_util.create_tt_data.model_data_convert import convertModelToRawData, createInputbyModel, \
     convertRawDataToModel
 
@@ -47,6 +47,7 @@ def testTT(model, epochs=7, batch_size=4, num_data_range=OPTIONS["Data"]["num_da
 
 def generateTTData(num_data, out_dim=10, max_layers=32, type="cnn", options=OPTIONS, columns=COLUMNS):
     result = collections.defaultdict(list)
+    mb = ModelBuild(options)
 
     for _ in tqdm(range(num_data)):
         rules = None
@@ -55,11 +56,11 @@ def generateTTData(num_data, out_dim=10, max_layers=32, type="cnn", options=OPTI
         elif type == "ffnn":
             rules = FFnnRules(max_layers=max_layers)
         assert rules is not None
-        kwargs_list, layer_orders, image_shape_list = generateRandomModelConfigList(rules.layer_order, options=options)
+        kwargs_list, layer_orders, image_shape_list = mb.generateRandomModelConfigList(rules.layer_order)
         if type == "cnn":
-            model = buildCnnModel(kwargs_list, layer_orders, out_dim)
+            model = mb.buildCnnModel(kwargs_list, layer_orders, out_dim)
         elif type == "ffnn":
-            model = buildFFnnModel(kwargs_list, layer_orders)
+            model = mb.buildFFnnModel(kwargs_list, layer_orders)
         test_res = testTT(model, num_data_range=options["Data"]["num_data"],
                           batch_size=kwargs_list[-1]["Fit"]["batch_size"])
         batch_input_shape = np.array([test_res["batch_size"], *test_res['x_shape'][1:]])
@@ -84,6 +85,6 @@ if __name__ == "__main__":
     result = generateTTData(num_data, out_dim, type="ffnn", max_layers=8)
     model, num_data, batch_input_shape = convertRawDataToModel(result["X_df"][0])
     convertModelToRawData(model, 1, batch_input_shape, result["X_df"][0].columns)
-    print(result["X_df"][0])
+    print(result["X_df"][0].activation)
 
     # pickle.dump(result, open(f"../data/local_dp{DATA_POINTS}_CNN_Data_1.pkl", 'wb'))

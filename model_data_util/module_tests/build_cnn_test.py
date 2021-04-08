@@ -3,7 +3,7 @@ import unittest
 from model_data_util.constant import OPTIONS
 from model_data_util.create_tt_data.cnn_build_rule import CnnRules
 from model_data_util.create_tt_data.generate_tt_data import testTT
-from model_data_util.create_tt_data.model_build import generateRandomModelConfigList, buildCnnModel
+from model_data_util.create_tt_data.model_build import ModelBuild
 
 
 class MyTestCase(unittest.TestCase):
@@ -18,10 +18,11 @@ class MyTestCase(unittest.TestCase):
             len(cnn_rules.layer_order) > 3,
             "Error: incorrect CNN layer structure")  # at least 1 convolutional layer, 1 flatten layer, and 1 dense layer
         out_dim = 10
-        kwargs_list, layer_orders, image_shape_list = generateRandomModelConfigList(cnn_rules.layer_order)
+        mb = ModelBuild()
+        kwargs_list, layer_orders, image_shape_list = mb.generateRandomModelConfigList(cnn_rules.layer_order)
         self.assertTrue(len(kwargs_list) == len(layer_orders) + 1 and len(kwargs_list) == len(image_shape_list) + 1,
                         f"Error: incorrect output {len(kwargs_list), len(layer_orders), len(image_shape_list)}")
-        model = buildCnnModel(kwargs_list, layer_orders, out_dim)
+        model = mb.buildCnnModel(kwargs_list, layer_orders, out_dim)
         testTT(model, OPTIONS["Data"]["num_data"])
         self.validImageShape(model, image_shape_list)
 

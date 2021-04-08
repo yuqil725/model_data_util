@@ -16,7 +16,7 @@ from tqdm import tqdm
 
 from model_data_util.constant import OPTIONS
 from model_data_util.create_tt_data.generate_tt_data import testTT
-from model_data_util.create_tt_data.model_build import chooseRandomComb
+from model_data_util.create_tt_data.model_build import ModelBuild
 from model_data_util.create_tt_data.model_data_convert import preprocessRawData, convertRawDataToModel
 
 
@@ -80,9 +80,10 @@ def layerAddition(df, max_add_layers=4, verbose=False):
     selected_layers += np.arange(0, selected_layers.shape[0], 1)
     if verbose:
         added_row = pd.DataFrame()
+    mb = ModelBuild()
     for l in selected_layers:
         row = new_df.iloc[l]
-        new_row = chooseRandomComb(OPTIONS[row.layer])
+        new_row = mb.chooseRandomComb(OPTIONS[row.layer])
         not_mu_layer = ["optimizer", "loss"]
         for i in new_row.keys():
             if i in not_mu_layer:
