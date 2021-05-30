@@ -12,23 +12,30 @@ OPTIONS["Model"]["layer"] = ["Conv2D", "Dense", "MaxPooling2D", "Dropout",
                              "Flatten"]  # the model's layer can be either Conv2D or Dense
 OPTIONS["Model"]["pure_activation_rate"] = {1: 0.8, 2: 0.1, 3: 0.05, 4: 0.025, 5: 0.0125,
                                             6: 0.0125}  # {number of activation types in one NN: probability}
-OPTIONS["Compile"]["optimizer"] = ["SGD", "RMSprop", "Adam", "Adadelta", "Adagrad", "Adamax", "Nadam", "Ftrl"]
+# OPTIONS["Compile"]["optimizer"] = ["SGD", "RMSprop", "Adam", "Adadelta", "Adagrad", "Adamax", "Nadam", "Ftrl"]
+OPTIONS["Compile"]["optimizer"] = ["sgd", "rmsprop", "adam", "adadelta", "adagrad", "adamax", "nadam", "ftrl"]
 OPTIONS["Compile"]["loss"] = ["categorical_crossentropy", "categorical_hinge", ]
 OPTIONS["Fit"]["batch_size"] = [2, 4, 8, 16, 32, 64, 128, 256]
 
 OPTIONS["Dense"]["units"] = range(1, 500)
-OPTIONS["Dense"]["activation"] = ["linear", "relu", "sigmoid", "softmax", "softplus", "softsign", "tanh", "selu", "elu",
+# OPTIONS["Dense"]["activation"] = ["linear", "relu", "sigmoid", "softmax", "softplus", "softsign", "tanh", "selu", "elu",
+#                                   "exponential"]
+OPTIONS["Dense"]["activation"] = ["relu", "sigmoid", "softmax", "softplus", "softsign", "tanh", "selu", "elu",
                                   "exponential"]
-OPTIONS["Dense"]["use_bias"] = [True, False]
+# OPTIONS["Dense"]["use_bias"] = [True, False]
+OPTIONS["Dense"]["use_bias"] = [True]
 
 OPTIONS["Conv2D"]["filters"] = range(1, 100)
 OPTIONS["Conv2D"]["kernel_size"] = list(zip(range(1, 50), range(1, 50)))  # tried product, but then RAM is in shortage
 OPTIONS["Conv2D"]["strides"] = [(1, 1)] * 10 + list(zip(range(1, 3), range(1, 3)))
 OPTIONS["Conv2D"]["padding"] = [*list(["same"] * 5), "valid"]
 # options["Conv2D"]["dilation_rate"] = [1, 2]
-OPTIONS["Conv2D"]["activation"] = ["linear", "relu", "sigmoid", "softmax", "softplus", "softsign", "tanh", "selu",
+# OPTIONS["Conv2D"]["activation"] = ["linear", "relu", "sigmoid", "softmax", "softplus", "softsign", "tanh", "selu",
+#                                    "elu", "exponential"]
+OPTIONS["Conv2D"]["activation"] = ["relu", "sigmoid", "softmax", "softplus", "softsign", "tanh", "selu",
                                    "elu", "exponential"]
-OPTIONS["Conv2D"]["use_bias"] = [True, False]
+# OPTIONS["Conv2D"]["use_bias"] = [True, False]
+OPTIONS["Conv2D"]["use_bias"] = [True]
 
 OPTIONS["MaxPooling2D"]["pool_size"] = list(zip(range(2, 10), range(2, 10)))
 OPTIONS["MaxPooling2D"]["strides"] = [(1, 1)] * 10 + list(zip(range(1, 3), range(1, 3)))
