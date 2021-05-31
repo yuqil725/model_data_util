@@ -1,5 +1,5 @@
-Utilities for Creating Random Model
----
+## Utilities for Creating Random Model
+
 The utils can be used to create random both CNN and FFNN. The model type depends on the constant variables and model
 rules.
 
@@ -16,3 +16,10 @@ the rules in _model_build_rule.py_
 
 For a simple demo, you could refer to this colab demo:
 https://colab.research.google.com/drive/1bNakVoczxWkm9KdAY9T_GenYi3pKJGTk?authuser=1#scrollTo=r1Z9D3rPtpYG
+
+---
+
+## Library update
+
+1. update lib version in setup.py
+2. python3 setup.py sdist; twine upload dist/\*
