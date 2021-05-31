@@ -32,7 +32,6 @@ class CnnRules:
         self.remain_dropout = 2
         self.initial_layer = ["Conv2D"]
         self.max_layers = max_layers  # the total max layers
-        self.part_layers_num = self.generatePartLayers()
         self.layer_order = []
         self.generatePartAll()
 
@@ -42,7 +41,7 @@ class CnnRules:
         """
         part_layers_num = {}
         part_layers_num["output"] = 1
-        part_layers_num["faltten"] = 1
+        part_layers_num["flatten"] = 1
         part_layers_num["dense"] = random.choice(range(3))
         remain_max_layers = self.max_layers - np.sum(list(part_layers_num.values()))
         part_layers_num["conv"] = random.choice(range(3, remain_max_layers))
@@ -109,7 +108,14 @@ class CnnRules:
         """
         Run all generatePartXXX functions
         """
+        self.part_layers_num = self.generatePartLayers()
         self.generatePartConv()
         self.generatePartFlatten()
         self.generatePartDense()
         self.generatePartOutput()
+        return self.layer_order
+
+
+if __name__ == "__main__":
+    cnn_rules = CnnRules()
+    print(cnn_rules.generatePartAll())
